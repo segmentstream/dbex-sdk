@@ -1,0 +1,15 @@
+<html>
+<head>
+  <script src="./dbex.js"></script>
+  <script type="text/javascript">
+  dbex('init', 'ZHJpdmViYWNrOjMx');
+  dbex(function() {
+    console.log(this.chooseVariation('123'));
+    console.log(this.chooseVariation('345'));
+    console.log(this.trackConversion('123'));
+    console.log(this.trackConversion('345', 2000));
+  });
+  </script>
+</head>
+<body></body>
+</html>
