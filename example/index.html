@@ -1,0 +1,17 @@
+<html>
+<head>
+  <script src="./../dist/dbex.min.js"></script>
+  <script type="text/javascript">
+  dbex('init', '50f93492-bc63-11e6-a4a6-cec0c932ce01');
+  dbex(function() {
+    var exp1_variation = this.chooseVariation('1f1a2fc6-1e36-450b-9c69-04b0c36da566');
+    var exp2_variation = this.chooseVariation('bc386a96-a5da-48bf-b45b-532c85644a8b');
+    console.log('Experiment 1 variation:', exp1_variation);
+    console.log('Experiment 2 variation:', exp2_variation);
+  });
+  dbex('trackConversion', '1f1a2fc6-1e36-450b-9c69-04b0c36da566');
+  dbex('trackConversion', 'bc386a96-a5da-48bf-b45b-532c85644a8b', 2000);
+  </script>
+</head>
+<body></body>
+</html>

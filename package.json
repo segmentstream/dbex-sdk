@@ -1,0 +1,32 @@
+{
+  "name": "dbex-sdk",
+  "version": "1.0.0",
+  "description": "Driveback Experiments",
+  "main": "src/dbex.js",
+  "dependencies": {
+    "grunt": "^1.0.1"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0",
+    "grunt": "^1.0.1",
+    "grunt-aws-s3": "^0.14.5",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-compress": "^1.3.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-eslint": "^19.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/driveback/dbex-sdk.git"
+  },
+  "author": "Driveback LLC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/driveback/dbex-sdk/issues"
+  },
+  "homepage": "https://github.com/driveback/dbex-sdk#readme"
+}
