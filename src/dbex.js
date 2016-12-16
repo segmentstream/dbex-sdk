@@ -6,7 +6,7 @@
   var EXPERIMENT_DATA_RECIEVED_COOKIE_NAME = '_dbexdr';
   var SESSION_COOKIE_EXPIRATION = 3600; // seconds
   var USER_COOKIE_EXPIRATION = 48211200; // seconds
-  var API_URL = '//dbex-tracker-stage.driveback.ru';
+  var API_URL = '//dbex-tracker.driveback.ru';
 
   var _isInitialized = false; // eslint-disable-line
   var _experiments = []; // eslint-disable-line
