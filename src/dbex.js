@@ -198,13 +198,14 @@
     var i;
 
     if (_isInitialized) return;
-    _isInitialized = true;
 
     _experiments = experiments;
     for (i = 0; i < experiments.length; i += 1) {
       _experimentsIndex[experiments[i][0]] = experiments[i];
     }
     actualizeCookies();
+
+    _isInitialized = true;
 
     for (i = 0; i < _callbackQ.length; i += 1) {
       execCmd(_callbackQ[i]);
