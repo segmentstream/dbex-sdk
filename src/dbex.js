@@ -12,6 +12,7 @@
   var _experiments = []; // eslint-disable-line
   var _experimentsIndex = {}; // eslint-disable-line
   var _callbackQ = []; // eslint-disable-line
+  var _isSupported; // eslint-disable-line
 
   function setCookie(name, value, seconds) {
     var expires;
@@ -39,22 +40,25 @@
   }
 
   function isSupported() {
+    if (_isSupported !== undefined) {
+      return _isSupported;
+    }
+
+    _isSupported = true;
     if (!JSON.stringify || !JSON.parse) {
-      return false;
+      _isSupported = false;
+    } else if (/(MSIE [0-8]\.\d+)/.test(navigator.userAgent)) {
+      _isSupported = false;
+    } else {
+      // check if in Safari private mode
+      try {
+        localStorage.test = 1;
+      } catch (e) {
+        _isSupported = false;
+      }
     }
 
-    if (/(MSIE [0-8]\.\d+)/.test(navigator.userAgent)) {
-      return false;
-    }
-
-    // check if in Safari private mode
-    try {
-      localStorage.test = 1;
-    } catch (e) {
-      return false;
-    }
-
-    return true;
+    return _isSupported;
   }
 
   function chooseVariation(variations) {
@@ -288,9 +292,9 @@
     }
   };
 
-  if (!isSupported()) {
-    return;
+  if (isSupported()) {
+    w.dbex = dbex;
+  } else {
+    w.dbex = function dbexFake() {};
   }
-
-  w.dbex = dbex;
 }(window));
