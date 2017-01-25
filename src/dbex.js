@@ -1,18 +1,28 @@
 (function dbexInit(w) {
   var dbex;
 
-  var SESSION_COOKIE_NAME = '_dbexs';
   var USER_COOKIE_NAME = '_dbexu';
   var EXPERIMENT_DATA_RECIEVED_COOKIE_NAME = '_dbexdr';
   var SESSION_COOKIE_EXPIRATION = 3600; // seconds
   var USER_COOKIE_EXPIRATION = 48211200; // seconds
-  var API_URL = '//dbex-tracker.driveback.ru';
+  var API_URL = '//dbex-tracker-stage.driveback.ru';
 
   var _isInitialized = false; // eslint-disable-line
   var _experiments = []; // eslint-disable-line
   var _experimentsIndex = {}; // eslint-disable-line
   var _callbackQ = []; // eslint-disable-line
   var _isSupported; // eslint-disable-line
+
+  /**
+  * [
+  *  [experimentId, variation, isSessionTracked],
+  *  [experimentId, variation, isSessionTracked],
+  *  ...
+  * ]
+  * ...
+  */
+  var _variationsInfo = []; // eslint-disable-line
+  var _variationsInfoIndex = {}; // eslint-disable-line
 
   function setCookie(name, value, seconds) {
     var expires;
@@ -37,6 +47,21 @@
       if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
+  }
+
+  function actualizeCookies() {
+    var i;
+    var cookieParts = [];
+    var cookieValue;
+
+    for (i = 0; i < _variationsInfo.length; i += 1) {
+      cookieParts.push(_variationsInfo[i].join(':'));
+    }
+
+    if (cookieParts.length > 0) {
+      cookieValue = cookieParts.join('|');
+      setCookie(USER_COOKIE_NAME, cookieValue, USER_COOKIE_EXPIRATION);
+    }
   }
 
   function isSupported() {
@@ -76,20 +101,6 @@
     return -1;
   }
 
-  function getCookieName(scope) {
-    if (scope !== 'session') {
-      return USER_COOKIE_NAME;
-    }
-    return SESSION_COOKIE_NAME;
-  }
-
-  function getCookieExpiration(scope) {
-    if (scope !== 'session') {
-      return USER_COOKIE_EXPIRATION;
-    }
-    return SESSION_COOKIE_EXPIRATION;
-  }
-
   function execCmd(cmd) {
     var method;
     var args;
@@ -108,71 +119,67 @@
     return _experimentsIndex[experimentId];
   }
 
-  function getChosenVariation(experimentId, scope) {
-    var i;
-    var cookieName = getCookieName(scope);
-    var cookieValue;
-    var experimentParts;
-    var parts;
+  function getChosenVariation(experimentId) {
+    var index = _variationsInfoIndex[experimentId];
 
-    cookieValue = getCookie(cookieName); // cookie: expId:variation|expiId:variation
-    if (cookieValue) {
-      experimentParts = cookieValue.split('|');
-      for (i = 0; i < experimentParts.length; i += 1) {
-        parts = experimentParts[i].split(':');
-        if (parts[0] === experimentId) {
-          return Number(parts[1]);
-        }
-      }
+    if (index !== undefined) {
+      return _variationsInfo[index][1];
     }
+
     return -1;
   }
 
-  function saveChosenVariation(experimentId, variation, scope) {
-    var cookieName = getCookieName(scope);
-    var cookieExpiration = getCookieExpiration(scope);
-    var cookieValue = getCookie(cookieName); // cookie: expId:variation|expiId:variation
-    var newPart = [experimentId, variation].join(':');
-    if (cookieValue) {
-      cookieValue = [cookieValue, newPart].join('|');
-    } else {
-      cookieValue = newPart;
+  function saveChosenVariation(experimentId, variation) {
+    var index = _variationsInfoIndex[experimentId];
+    if (index === undefined) {
+      _variationsInfoIndex[experimentId] = _variationsInfo.length;
+      _variationsInfo.push([experimentId, variation, 0]); // expId, variation, sessionTracked
+      actualizeCookies();
+    } else if (_variationsInfo[index][1] !== variation) {
+      _variationsInfo[index][1] = variation;
+      _variationsInfo[index][2] = 0; // reset sessionTracked status if variation was changed
+      actualizeCookies();
     }
-    setCookie(cookieName, cookieValue, cookieExpiration);
   }
 
-  function actualizeCookies() {
-    var i;
+  function saveSessionTracked(experimentId) {
+    var index = _variationsInfoIndex[experimentId];
+    if (index !== undefined) {
+      _variationsInfo[index][2] = 1; // set sessionTracked status to '1'
+      actualizeCookies();
+    }
+  }
+
+  function isSessionTracked(experimentId) {
+    var index = _variationsInfoIndex[experimentId];
+    if (index !== undefined) {
+      if (_variationsInfo[index][2] === 1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function loadVariationsInfoFromCookies() {
     var j;
-    var scopes = ['user', 'session'];
-    var scope;
-    var cookieName;
     var cookieValue;
-    var cookieExpiration;
     var experimentParts;
-    var actualizedExperimentParts = [];
     var parts;
     var experimentId;
 
-    for (i = 0; i < scopes.length; i += 1) {
-      scope = scopes[i];
-      cookieName = getCookieName(scope);
-      cookieExpiration = getCookieExpiration(scope);
-      cookieValue = getCookie(cookieName);
-      if (cookieValue) {
-        experimentParts = cookieValue.split('|');
-        for (j = 0; j < experimentParts.length; j += 1) {
-          parts = experimentParts[j].split(':');
-          experimentId = parts[0];
-          if (_experimentsIndex[experimentId]) {
-            actualizedExperimentParts.push(experimentParts[j]);
-          }
+    cookieValue = getCookie(USER_COOKIE_NAME);
+    if (cookieValue) {
+      experimentParts = cookieValue.split('|');
+      for (j = 0; j < experimentParts.length; j += 1) {
+        parts = experimentParts[j].split(':');
+        experimentId = parts[0];
+        if (_experimentsIndex[experimentId]) {
+          _variationsInfoIndex[experimentId] = _variationsInfo.length;
+          _variationsInfo.push([parts[0], Number(parts[1]), Number(parts[2])]);
         }
-        cookieValue = actualizedExperimentParts.join('|');
-        setCookie(cookieName, cookieValue, cookieExpiration);
       }
     }
-    setCookie(EXPERIMENT_DATA_RECIEVED_COOKIE_NAME, 'x', SESSION_COOKIE_EXPIRATION);
   }
 
   function addPixel(pixelUrl) {
@@ -182,6 +189,7 @@
   function trackSession(experimentId, variation) {
     var pixelUrl = API_URL + '/track?t=s&exp=' + experimentId + '&var=' + variation;
     addPixel(pixelUrl);
+    saveSessionTracked(experimentId);
   }
 
   function trackConversion(experimentId, variation, value) {
@@ -207,6 +215,8 @@
     for (i = 0; i < experiments.length; i += 1) {
       _experimentsIndex[experiments[i][0]] = experiments[i];
     }
+
+    loadVariationsInfoFromCookies();
     actualizeCookies();
 
     _isInitialized = true;
@@ -273,21 +283,48 @@
       variation = chooseVariation(experiment[1]);
       if (variation >= 0) {
         saveChosenVariation(experimentId, variation);
-        trackSession(experimentId, variation);
       }
     }
 
     return variation;
   };
 
-  dbex.trackConversion = function dbexTrackConversion(experimentId, value) {
+  dbex.setVariation = function dbexSetVariation(experimentId, variation) {
+    var experiment = getExperiment(experimentId);
+
+    if (!experiment) return;
+
+    if (variation >= 0) {
+      saveChosenVariation(experimentId, variation);
+    }
+  };
+
+  dbex.trackSession = function dbexTrackSession(experimentId) {
     var experiment = getExperiment(experimentId);
     var variation;
+    var sessionTracked;
 
     if (!experiment) return;
 
     variation = getChosenVariation(experimentId);
-    if (variation >= 0) {
+    sessionTracked = isSessionTracked(experimentId);
+
+    if (!sessionTracked && variation >= 0) {
+      trackSession(experimentId, variation);
+    }
+  };
+
+  dbex.trackConversion = function dbexTrackConversion(experimentId, value) {
+    var experiment = getExperiment(experimentId);
+    var variation;
+    var sessionTracked;
+
+    if (!experiment) return;
+
+    variation = getChosenVariation(experimentId);
+    sessionTracked = isSessionTracked(experimentId);
+
+    if (sessionTracked && variation >= 0) {
       trackConversion(experimentId, variation, value);
     }
   };

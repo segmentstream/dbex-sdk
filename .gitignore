@@ -3,3 +3,4 @@ npm-debug.log
 aws-keys.json
 node_modules
 .DS_Store
+dist
