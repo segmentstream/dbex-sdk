@@ -309,6 +309,10 @@
     variation = getChosenVariation(experimentId);
     sessionTracked = isSessionTracked(experimentId);
 
+    if (variation < 0) {
+      variation = dbex.chooseVariation(experimentId);
+    }
+
     if (!sessionTracked && variation >= 0) {
       trackSession(experimentId, variation);
     }
