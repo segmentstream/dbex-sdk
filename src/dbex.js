@@ -2,6 +2,7 @@
   var dbex;
 
   var USER_COOKIE_NAME = '_dbexu';
+  var LOCALSTORAGE_KEY = 'dbex::data';
   var EXPERIMENT_DATA_RECIEVED_COOKIE_NAME = '_dbexdr';
   var SESSION_COOKIE_EXPIRATION = 3600; // seconds
   var USER_COOKIE_EXPIRATION = 48211200; // seconds
@@ -200,7 +201,7 @@
 
   function hasExperimentData() {
     var cookieVal = getCookie(EXPERIMENT_DATA_RECIEVED_COOKIE_NAME);
-    if (cookieVal) {
+    if (cookieVal && localStorage.getItem(LOCALSTORAGE_KEY)) {
       return true;
     }
     return false;
@@ -236,13 +237,13 @@
   }
 
   function onExperimentDataLoaded(experiments) {
-    localStorage.setItem('dbex::data', JSON.stringify(experiments));
+    localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(experiments));
     setCookie(EXPERIMENT_DATA_RECIEVED_COOKIE_NAME, 'x', SESSION_COOKIE_EXPIRATION);
     init(experiments);
   }
 
   function initFromLocalStorage() {
-    var experiments = JSON.parse(localStorage.getItem('dbex::data') || []);
+    var experiments = JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || []);
     init(experiments);
   }
 
