@@ -25,6 +25,10 @@
   var _variationsInfo = []; // eslint-disable-line
   var _variationsInfoIndex = {}; // eslint-disable-line
 
+  if (w.dbex) {
+    return; // dbex snippet is already included
+  }
+
   function setCookie(name, value, seconds) {
     var expires;
     var date = new Date();
