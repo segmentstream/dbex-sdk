@@ -338,6 +338,16 @@
     }
   };
 
+  dbex.chooseVariations = function dbexGetVariations() {
+    var i;
+    var variations = {};
+    for (i = 0; i < _experiments.length; i += 1) {
+      variations[_experiments[i][0]] = this.chooseVariation(_experiments[i][0]);
+    }
+
+    return variations;
+  };
+
   if (isSupported()) {
     w.dbex = dbex;
   } else {
