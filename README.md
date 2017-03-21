@@ -39,7 +39,7 @@ dbex(function() {
 });
 ```
 
-### 4. Track experiment session
+### 5. Track experiment session
 
 Example:
 
@@ -49,7 +49,7 @@ dbex('trackSession', '<EXPERIMENT_ID>');
 
 Note: should be called any time user sees (experiences) experiment
 
-### 5. Track conversions for your Experiment
+### 6. Track conversions for your Experiment
 
 Example:
 
@@ -63,7 +63,7 @@ Example for tracking sales:
 dbex('trackConversion', '<EXPERIMENT_ID>', 800);
 ```
 
-### 6. Results are updated in admin panel every 60 minutes
+### 7. Results are updated in admin panel every 60 minutes
 
 ![alt tag](http://i.imgur.com/btlfjyw.png)
 
