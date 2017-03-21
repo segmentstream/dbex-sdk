@@ -1,6 +1,6 @@
 # Driveback Experiments
 
-Driveback Experiments API helps to run A/B/n tests on your website with simple API. You can use either directly on your website or through you tag management system.
+Driveback Experiments API helps to run client-side and server-side A/B/n tests on your website with simple API. You can use it either directly on your website or through you tag management system.
 
 ## How to use
 
@@ -78,7 +78,7 @@ dbex(function() {
   // make changes in UI based on varaition
   // ...
 });
-dbex('trackConversion', '<EXPERIMENT_ID>'); // track experiment session
+dbex('trackSession', '<EXPERIMENT_ID>'); // track experiment session
 ```
 
 ## Server side A/B/n testing flow
@@ -90,5 +90,5 @@ dbex('setVariation', '<EXPERIMENT_ID>', '<VARIATION_RETURNED_FROM_SERVER>'); //0
 // make changes in UI based on varaition
 // ...
 
-dbex('trackConversion', '<EXPERIMENT_ID>'); // track experiment session
+dbex('trackSession', '<EXPERIMENT_ID>'); // track experiment session
 ```
