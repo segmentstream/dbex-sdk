@@ -6,11 +6,10 @@ Driveback Experiments API helps to run A/B/n tests on your website with simple A
 
 ### 1. Add dbex.min.js in the head of your page
 
-Note: dbex.min.js file can be found [here](https://github.com/driveback/dbex-sdk/tree/master/dist).
-
 ```html
 <script src="http://YOURWEBSITE.COM/js/dbex.min.js"></script>
 ```
+Note: dbex.min.js file can be [downloaded here](https://github.com/driveback/dbex-sdk/tree/master/dist).
 
 ### 2. Initialize Driveback Experiments
 
